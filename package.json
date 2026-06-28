@@ -1,0 +1,9 @@
+{
+  "name": "doxy-friends-backend",
+  "version": "1.0.0",
+  "description": "Vercel-compatible backend for Authentication",
+  "main": "api/login.js",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.0.0"
+  }
+}
