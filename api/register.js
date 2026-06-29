@@ -17,16 +17,16 @@ module.exports = async (req, res) => {
   const email = `${username}@auth.eaglercraft.com`;
 
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
 
     if (error) {
-      return res.status(401).json({ error: error.message });
+      return res.status(400).json({ error: error.message });
     }
 
-    res.status(200).json({ session: data.session });
+    res.status(200).json({ message: 'User registered successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Internal server error' });
   }
