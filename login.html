@@ -31,8 +31,10 @@
             });
             const data = await res.json();
             if (res.ok) {
-                msg.textContent = 'Login successful!';
+                msg.textContent = 'Login successful! Closing...';
                 msg.style.color = 'green';
+                window.opener.postMessage({ type: 'AUTH_SUCCESS', token: data.session.access_token }, '*');
+                window.close();
             } else {
                 msg.textContent = 'Error: ' + data.error;
                 msg.style.color = 'red';
