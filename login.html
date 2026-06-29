@@ -36,19 +36,23 @@
                 const data = await res.json();
                 
                 if (res.ok) {
-                    msg.textContent = 'Login successful! Redirecting...';
+                    msg.textContent = 'Login successful! You can close this tab and return to the game.';
                     msg.style.color = 'green';
                     console.log('Sending AUTH_SUCCESS to parent...');
-                    
+
                     if (window.parent && window.parent.opener) {
-                        window.parent.opener.postMessage({ type: 'AUTH_SUCCESS', token: data.session.access_token }, '*');
+                        window.parent.opener.postMessage({ type: 'AUTH_SUCCESS', token: data.session.access_token, username: data.session.username }, '*');
                         console.log('Message sent successfully!');
-                    } else {
-                        console.error('Cannot find window.parent.opener');
                     }
-                    
-                    setTimeout(() => window.close(), 1000);
+                    // Attempt to close, but fall back to a manual close prompt
+                    setTimeout(() => {
+                        window.close();
+                        if (!window.closed) {
+                            msg.textContent = 'Login successful! You may now close this tab safely.';
+                        }
+                    }, 1000);
                 } else {
+
                     throw new Error(data.error || 'Login failed');
                 }
             } catch (error) {

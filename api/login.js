@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
     const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     // Return structure expected by frontend
-    res.status(200).json({ session: { access_token: token } });
+    res.status(200).json({ session: { access_token: token, username: username } });
   } catch (err) {
     res.status(500).json({ error: 'Internal server error' });
   }
