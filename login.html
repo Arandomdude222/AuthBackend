@@ -21,22 +21,39 @@
         document.getElementById('loginForm').onsubmit = async (e) => {
             e.preventDefault();
             const msg = document.getElementById('message');
-            const res = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    username: document.getElementById('username').value,
-                    password: document.getElementById('password').value
-                })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                msg.textContent = 'Login successful! Redirecting you back to DoxyClient...';
-                msg.style.color = 'green';
-                window.opener.postMessage({ type: 'AUTH_SUCCESS', token: data.session.access_token }, '*');
-                window.close();
-            } else {
-                msg.textContent = 'Error: ' + data.error;
+            console.log('Login attempt initiated');
+            
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('username').value,
+                        password: document.getElementById('password').value
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    msg.textContent = 'Login successful! Redirecting...';
+                    msg.style.color = 'green';
+                    console.log('Sending AUTH_SUCCESS to parent...');
+                    
+                    if (window.parent && window.parent.opener) {
+                        window.parent.opener.postMessage({ type: 'AUTH_SUCCESS', token: data.session.access_token }, '*');
+                        console.log('Message sent successfully!');
+                    } else {
+                        console.error('Cannot find window.parent.opener');
+                    }
+                    
+                    setTimeout(() => window.close(), 1000);
+                } else {
+                    throw new Error(data.error || 'Login failed');
+                }
+            } catch (error) {
+                console.error('Login Flow Error:', error.message);
+                msg.textContent = 'Error: ' + error.message;
                 msg.style.color = 'red';
             }
         };
