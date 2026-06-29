@@ -1,5 +1,6 @@
 const { createClient } = require('@supabase/supabase-js');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
@@ -31,7 +32,11 @@ module.exports = async (req, res) => {
       return res.status(401).json({ error: 'Invalid username or password' });
     }
 
-    res.status(200).json({ message: 'Login successful' });
+    // Generate secure JWT
+    const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    // Return structure expected by frontend
+    res.status(200).json({ session: { access_token: token } });
   } catch (err) {
     res.status(500).json({ error: 'Internal server error' });
   }
