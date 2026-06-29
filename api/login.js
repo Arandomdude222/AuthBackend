@@ -13,8 +13,8 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: 'Username and password are required' });
   }
 
-  // Map username to a dummy email for Supabase Auth
-  const email = `${username}@auth.eaglercraft.com`;
+  // Use username as part of the email, ensure it's a valid format
+  const email = `${username.toLowerCase().replace(/[^a-z0-9]/g, '')}@auth.eaglercraft.com`;
 
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
