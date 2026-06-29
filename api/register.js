@@ -1,4 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
+const bcrypt = require('bcryptjs');
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
@@ -13,20 +14,21 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: 'Username and password are required' });
   }
 
-  // Use username as part of the email, ensure it's a valid format
-  const email = `${username.toLowerCase().replace(/[^a-z0-9]/g, '')}@auth.eaglercraft.com`;
-
   try {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const { error } = await supabase
+      .from('users')
+      .insert([{ username, password_hash: hashedPassword }]);
 
     if (error) {
+      if (error.code === '23505') { // Unique constraint violation (username exists)
+        return res.status(400).json({ error: 'Username already taken' });
+      }
       return res.status(400).json({ error: error.message });
     }
 
-    res.status(200).json({ message: 'User registered successfully' });
+    res.status(200).json({ message: 'Registration successful' });
   } catch (err) {
     res.status(500).json({ error: 'Internal server error' });
   }
