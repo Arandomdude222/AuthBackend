@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - Eaglercraft Auth</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; }
+        form { display: flex; flex-direction: column; width: 300px; }
+        input { margin-bottom: 10px; padding: 8px; }
+    </style>
+</head>
+<body>
+    <form id="registerForm">
+        <h2>Register</h2>
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+        <button type="submit">Register</button>
+        <p id="message"></p>
+    </form>
+    <script>
+        document.getElementById('registerForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const msg = document.getElementById('message');
+            const pass = document.getElementById('password').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            
+            if (pass !== confirm) {
+                msg.textContent = 'Passwords do not match!';
+                msg.style.color = 'red';
+                return;
+            }
+
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: document.getElementById('username').value,
+                    password: pass
+                })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                msg.textContent = 'Registration successful!';
+                msg.style.color = 'green';
+            } else {
+                msg.textContent = 'Error: ' + data.error;
+                msg.style.color = 'red';
+            }
+        };
+    </script>
+</body>
+</html>
