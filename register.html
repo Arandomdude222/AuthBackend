@@ -41,8 +41,9 @@
             });
             const data = await res.json();
             if (res.ok) {
-                msg.textContent = 'Registration successful!';
+                msg.textContent = 'Registration successful! Redirecting you back to DoxyClient...';
                 msg.style.color = 'green';
+                window.close(); // Optionally trigger a message back if needed
             } else {
                 msg.textContent = 'Error: ' + data.error;
                 msg.style.color = 'red';
