@@ -2,113 +2,175 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login - Eaglercraft Auth</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Sign in - DoxyClient Auth</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
             font-family: 'Inter', sans-serif; 
             min-height: 100vh; 
             display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-            color: #fff;
+            background-color: #24272a;
+            color: #ffffff;
         }
-        .container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
+        .left-panel {
+            flex: 1;
+            background: radial-gradient(circle at 10% 20%, #0f325a 0%, #15203b 40%, #431f47 80%, #68263e 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 10%;
+        }
+        .left-panel h1 {
+            font-size: 3rem;
+            font-weight: 400;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+        .left-panel p {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+        }
+        .right-panel {
+            width: 450px;
+            background-color: #272a2e;
+            display: flex;
+            flex-direction: column;
             padding: 40px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease;
+            position: relative;
         }
-        .container:hover { transform: translateY(-5px); }
+        .right-content {
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+        .top-logo {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
         h2 { 
-            text-align: center; 
-            margin-bottom: 30px; 
-            font-size: 2rem; 
-            font-weight: 800;
-            background: linear-gradient(to right, #38bdf8, #818cf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 1.75rem; 
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #ffffff;
         }
-        form { display: flex; flex-direction: column; gap: 15px; }
+        .subtitle {
+            font-size: 0.9rem;
+            color: #d1d5db;
+            margin-bottom: 35px;
+        }
+        .subtitle a {
+            color: #60a5fa;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .subtitle a:hover { text-decoration: underline; }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
         input { 
             width: 100%;
-            padding: 12px 15px; 
-            border-radius: 10px; 
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            background: rgba(0, 0, 0, 0.2);
+            padding: 12px; 
+            border-radius: 4px; 
+            border: 1px solid #4b5563; 
+            background-color: transparent;
             color: #fff;
             font-size: 1rem;
             outline: none;
-            transition: all 0.3s ease;
+            transition: border-color 0.2s;
         }
-        input:focus {
-            border-color: #38bdf8;
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3);
-            background: rgba(0, 0, 0, 0.4);
-        }
-        input::placeholder { color: rgba(255, 255, 255, 0.5); }
+        input:focus { border-color: #60a5fa; }
+        
         button { 
-            background: linear-gradient(to right, #38bdf8, #818cf8);
-            color: #fff;
+            width: 100%;
+            background-color: #72a5f7;
+            color: #111827;
             border: none;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 1rem;
+            padding: 13px;
+            border-radius: 4px;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
+            transition: background-color 0.2s;
+            margin-top: 15px;
         }
-        button:hover {
-            box-shadow: 0 10px 15px -3px rgba(56, 189, 248, 0.4);
-            transform: scale(1.02);
-        }
-        button:active { transform: scale(0.98); }
+        button:hover { background-color: #93c5fd; }
+        
         #message { 
             margin-top: 15px; 
             text-align: center; 
-            font-size: 0.9rem; 
+            font-size: 0.85rem; 
             min-height: 20px;
-            font-weight: 600;
         }
-        .footer-link {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.6);
+        
+        .footer {
+            margin-top: auto;
+            font-size: 0.8rem;
+            color: #9ca3af;
+            display: flex;
+            gap: 15px;
+            align-items: center;
         }
-        .footer-link a {
-            color: #38bdf8;
-            text-decoration: none;
-            transition: color 0.2s;
+        .footer a { color: #60a5fa; text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+        .footer span { margin-left: auto; color: #d1d5db; }
+        
+        @media (max-width: 800px) {
+            .left-panel { display: none; }
+            .right-panel { width: 100%; }
         }
-        .footer-link a:hover { color: #818cf8; text-decoration: underline; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <form id="loginForm">
-            <h2>Sign In</h2>
-            <input type="text" id="username" placeholder="Username" required autocomplete="off">
-            <input type="password" id="password" placeholder="Password" required>
-            <button type="submit">Login</button>
-            <p id="message"></p>
-        </form>
-        <div class="footer-link">
-            Don't have an account? <a href="/register">Register here</a>
+    <div class="left-panel">
+        <h1>DoxyClient Auth</h1>
+        <p>Advanced authentication management</p>
+    </div>
+    <div class="right-panel">
+        <div class="top-logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            DoxyClient
+        </div>
+        <div class="right-content">
+            <h2>Sign in</h2>
+            <div class="subtitle">Don't have an account? <a href="/register">Create an account</a></div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit">Next</button>
+                <p id="message"></p>
+            </form>
+        </div>
+        <div class="footer">
+            <a href="#">Terms</a>
+            <a href="#">Policy</a>
+            <span>© 2026 DoxyClient, Inc.</span>
         </div>
     </div>
     <script>
         window.onload = () => {
-            const token = localStorage.getItem('eaglercraft_token');
-            const username = localStorage.getItem('eaglercraft_username');
+            const token = localStorage.getItem('doxyclient_token');
+            const username = localStorage.getItem('doxyclient_username');
             if (token && username) {
                 if (window.parent && window.parent.opener) {
                     window.parent.opener.postMessage({ type: 'AUTH_SUCCESS', token, username }, '*');
@@ -123,7 +185,6 @@
         document.getElementById('loginForm').onsubmit = async (e) => {
             e.preventDefault();
             const msg = document.getElementById('message');
-            console.log('Login attempt initiated');
             
             try {
                 const res = await fetch('/api/login', {
@@ -143,11 +204,9 @@
 
                     msg.textContent = 'Login successful! You can close this tab and return to the game.';
                     msg.style.color = '#4ade80';
-                    console.log('Sending AUTH_SUCCESS to parent...');
 
                     if (window.parent && window.parent.opener) {
                         window.parent.opener.postMessage({ type: 'AUTH_SUCCESS', token: data.session.access_token, username: data.session.username }, '*');
-                        console.log('Message sent successfully!');
                     }
                     setTimeout(() => {
                         window.close();
@@ -159,7 +218,6 @@
                     throw new Error(data.error || 'Login failed');
                 }
             } catch (error) {
-                console.error('Login Flow Error:', error.message);
                 msg.textContent = 'Error: ' + error.message;
                 msg.style.color = '#f87171';
             }
