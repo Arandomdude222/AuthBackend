@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Profile Settings - DoxyClient</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    background-color: #24272a;
+    color: #ffffff;
+}
+
+/* LEFT PANEL (unchanged) */
+.left-panel {
+    flex: 1;
+    background: radial-gradient(circle at 10% 20%, #0f325a 0%, #15203b 40%, #431f47 80%, #68263e 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10%;
+}
+
+.left-panel h1 {
+    font-size: 3rem;
+    font-weight: 400;
+    margin-bottom: 20px;
+}
+
+.left-panel p {
+    font-size: 1.25rem;
+    color: rgba(255,255,255,0.9);
+}
+
+/* RIGHT PANEL (same style as login) */
+.right-panel {
+    width: 450px;
+    background-color: #272a2e;
+    display: flex;
+    flex-direction: column;
+    padding: 40px;
+}
+
+.top-logo {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.right-content {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.subtitle {
+    font-size: 0.9rem;
+    color: #d1d5db;
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+label {
+    display: block;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 4px;
+    border: 1px solid #4b5563;
+    background: transparent;
+    color: white;
+    outline: none;
+}
+
+input:focus {
+    border-color: #60a5fa;
+}
+
+button {
+    width: 100%;
+    background-color: #72a5f7;
+    color: #111827;
+    border: none;
+    padding: 13px;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #93c5fd;
+}
+
+.secondary {
+    background: #3a3f45;
+    color: white;
+}
+
+.secondary:hover {
+    background: #4a5158;
+}
+
+#message {
+    margin-top: 15px;
+    text-align: center;
+    min-height: 20px;
+    font-size: 0.85rem;
+}
+
+.footer {
+    margin-top: auto;
+    font-size: 0.8rem;
+    color: #9ca3af;
+    display: flex;
+    gap: 15px;
+}
+
+.footer span {
+    margin-left: auto;
+}
+</style>
+</head>
+
+<body>
+
+<div class="left-panel">
+    <h1>DoxyClient</h1>
+    <p>Manage your Eaglercraft account settings</p>
+</div>
+
+<div class="right-panel">
+
+<div class="top-logo">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+stroke="currentColor" stroke-width="2">
+<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+</svg>
+Profile
+</div>
+
+<div class="right-content">
+
+<h2>Account Settings</h2>
+<div class="subtitle">Update your username and password</div>
+
+<form id="profileForm">
+
+<div class="form-group">
+<label>Username</label>
+<input id="username" type="text">
+</div>
+
+<div class="form-group">
+<label>Current Password</label>
+<input id="currentPassword" type="password">
+</div>
+
+<div class="form-group">
+<label>New Password</label>
+<input id="newPassword" type="password">
+</div>
+
+<button type="submit">Save Changes</button>
+
+<button type="button" class="secondary" id="logoutBtn">
+Log Out
+</button>
+
+<p id="message"></p>
+
+</form>
+
+</div>
+
+<div class="footer">
+<span>© 2026 DoxyClient</span>
+</div>
+
+</div>
+
+<script>
+const token = localStorage.getItem("eaglercraft_token");
+
+if (!token) {
+    location.href = "/login";
+}
+
+/* LOAD CURRENT USER */
+async function loadMe() {
+    try {
+        const res = await fetch("/api/me", {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
+
+        const data = await res.json();
+        if (data.username) {
+            document.getElementById("username").value = data.username;
+        }
+    } catch {}
+}
+
+loadMe();
+
+/* SAVE CHANGES */
+document.getElementById("profileForm").onsubmit = async (e) => {
+    e.preventDefault();
+
+    const msg = document.getElementById("message");
+
+    try {
+        const newUsername = document.getElementById("username").value;
+        const currentPassword = document.getElementById("currentPassword").value;
+        const newPassword = document.getElementById("newPassword").value;
+
+        /* 1. CHANGE USERNAME */
+        const uRes = await fetch("/api/change-username", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({ newUsername })
+        });
+
+        const uData = await uRes.json();
+        if (uData.session?.access_token) {
+            localStorage.setItem("eaglercraft_token", uData.session.access_token);
+        }
+
+        /* 2. CHANGE PASSWORD (only if filled) */
+        if (newPassword && currentPassword) {
+            const pRes = await fetch("/api/change-password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify({
+                    currentPassword,
+                    newPassword
+                })
+            });
+
+            const pData = await pRes.json();
+            if (!pRes.ok) throw new Error(pData.error || "Password failed");
+        }
+
+        msg.style.color = "#4ade80";
+        msg.textContent = "Profile updated successfully";
+
+    } catch (err) {
+        msg.style.color = "#f87171";
+        msg.textContent = err.message;
+    }
+};
+
+/* LOGOUT */
+document.getElementById("logoutBtn").onclick = () => {
+    localStorage.removeItem("eaglercraft_token");
+    localStorage.removeItem("eaglercraft_username");
+    location.href = "/login";
+};
+</script>
+
+</body>
+</html>
