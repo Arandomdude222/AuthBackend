@@ -18,6 +18,20 @@
         <p id="message"></p>
     </form>
     <script>
+        window.onload = () => {
+            const token = localStorage.getItem('eaglercraft_token');
+            const username = localStorage.getItem('eaglercraft_username');
+            if (token && username) {
+                if (window.parent && window.parent.opener) {
+                    window.parent.opener.postMessage({ type: 'AUTH_SUCCESS', token, username }, '*');
+                }
+                const msg = document.getElementById('message');
+                msg.textContent = 'Already logged in! You can close this tab.';
+                msg.style.color = 'green';
+                setTimeout(() => window.close(), 1000);
+            }
+        };
+
         document.getElementById('loginForm').onsubmit = async (e) => {
             e.preventDefault();
             const msg = document.getElementById('message');
@@ -36,6 +50,9 @@
                 const data = await res.json();
                 
                 if (res.ok) {
+                    localStorage.setItem('eaglercraft_token', data.session.access_token);
+                    localStorage.setItem('eaglercraft_username', data.session.username);
+
                     msg.textContent = 'Login successful! You can close this tab and return to the game.';
                     msg.style.color = 'green';
                     console.log('Sending AUTH_SUCCESS to parent...');
