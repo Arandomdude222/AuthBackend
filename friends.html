@@ -19,8 +19,15 @@
 <body>
 <main>
     <section class="card">
+        <div class="card-title">Find Friends</div>
+        <input type="text" id="searchUsername" placeholder="Search by username">
+        <button onclick="searchPlayer()">Search</button>
+        <div id="searchResults"></div>
+    </section>
+
+    <section class="card">
         <div class="card-title">Add Friend</div>
-        <input type="text" id="addFriendUsername" placeholder="Enter username">
+        <input type="text" id="addFriendUsername" placeholder="Enter exact username">
         <button onclick="sendRequest()">Send Request</button>
     </section>
 
@@ -57,6 +64,26 @@
         } catch {}
     }
     init();
+
+    async function searchPlayer() {
+        const username = document.getElementById("searchUsername").value;
+        const res = await fetch("/api/search-players", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+            body: JSON.stringify({ username })
+        });
+        const resultDiv = document.getElementById("searchResults");
+        if (res.ok) {
+            const data = await res.json();
+            resultDiv.innerHTML = `<p>Found: ${data.username} <button onclick="addFromSearch('${data.username}')">Add</button></p>`;
+        } else {
+            resultDiv.innerHTML = `<p>User not found</p>`;
+        }
+    }
+
+    function addFromSearch(username) {
+        document.getElementById("addFriendUsername").value = username;
+    }
 
     async function loadFriends() {
         const res = await fetch("/api/get-friends", { headers: { "Authorization": "Bearer " + token } });
