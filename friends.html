@@ -9,70 +9,69 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Inter', sans-serif; min-height: 100vh; background: radial-gradient(circle at 10% 20%, #0f325a 0%, #15203b 40%, #431f47 80%, #68263e 100%); background-attachment: fixed; color: #ffffff; }
     main { max-width: 600px; margin: 0 auto; padding: 48px 24px 80px; }
-    .card { background-color: rgba(39, 42, 46, 0.65); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 26px 28px; margin-bottom: 24px; }
-    .card-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 4px; }
-    .card-desc { font-size: 0.85rem; color: #9ca3af; margin-bottom: 22px; }
+    
+    /* Tabs */
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+    .tab-btn { padding: 10px 20px; cursor: pointer; background: rgba(39, 42, 46, 0.6); border: none; border-radius: 8px; color: white; }
+    .tab-btn.active { background: #72a5f7; color: #111827; }
+    
+    .tab-content { display: none; background: rgba(39, 42, 46, 0.65); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 26px; }
+    .tab-content.active { display: block; }
+
     input { width: 100%; padding: 12px; border-radius: 4px; border: 1px solid #4b5563; background: transparent; color: white; margin-bottom: 10px; }
-    button { padding: 10px 18px; border-radius: 4px; border: none; background: #72a5f7; cursor: pointer; }
+    button { padding: 10px 18px; border-radius: 4px; border: none; background: #72a5f7; cursor: pointer; font-weight: 600; }
+    .item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
 </style>
 </head>
 <body>
 <main>
-    <section class="card">
-        <div class="card-title">Find Friends</div>
-        <input type="text" id="searchUsername" placeholder="Search by username">
-        <button onclick="searchPlayer()">Search</button>
-        <div id="searchResults"></div>
-    </section>
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('friends')">Friends</button>
+        <button class="tab-btn" onclick="openTab('search')">Search</button>
+        <button class="tab-btn" onclick="openTab('requests')">Requests</button>
+    </div>
 
-    <section class="card">
-        <div class="card-title">Add Friend</div>
-        <input type="text" id="addFriendUsername" placeholder="Enter exact username">
-        <button onclick="sendRequest()">Send Request</button>
-    </section>
-
-    <section class="card">
-        <div class="card-title">My Friends</div>
+    <div id="friends" class="tab-content active">
         <div id="friendsList"></div>
-    </section>
-
-    <section class="card">
-        <div class="card-title">Friend Requests</div>
+    </div>
+    <div id="search" class="tab-content">
+        <input type="text" id="searchUsername" placeholder="Search by username..." oninput="searchPlayer()">
+        <div id="searchResults"></div>
+    </div>
+    <div id="requests" class="tab-content">
         <div id="friendRequestsList"></div>
-    </section>
+    </div>
 </main>
 <script>
     const token = localStorage.getItem("eaglercraft_token");
     if (!token) location.href = "/login";
     
-    let currentUsername = "";
-
-    async function init() {
-        try {
-            const res = await fetch("/api/me", { headers: { "Authorization": "Bearer " + token } });
-            const data = await res.json();
-            if (data.username) {
-                currentUsername = data.username;
-                loadFriends();
-                loadRequests();
-            }
-        } catch {}
+    function openTab(id) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.target.classList.add('active');
     }
-    init();
 
-    async function loadRequests() {
-        const res = await fetch("/api/friends", { 
+    async function api(action, body = {}) {
+        const res = await fetch("/api/friends", {
             method: 'POST',
             headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-            body: JSON.stringify({ action: 'get-requests' })
+            body: JSON.stringify({ action, ...body })
         });
-        const requests = await res.json();
-        const list = document.getElementById("friendRequestsList");
-        list.innerHTML = requests.map(r => `<div>${r.sender_username} <button onclick="acceptRequest('${r.id}')">Accept</button></div>`).join('');
+        return res.json();
+    }
+
+    async function loadFriends() {
+        const friends = await api('get-friends');
+        document.getElementById("friendsList").innerHTML = friends.map(f => 
+            `<div class="item">${f} <button onclick="removeFriend('${f}')">Remove</button></div>`
+        ).join('');
     }
 
     async function searchPlayer() {
         const username = document.getElementById("searchUsername").value;
+        if (!username) return;
         const res = await fetch("/api/friends", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
@@ -81,46 +80,37 @@
         const resultDiv = document.getElementById("searchResults");
         if (res.ok) {
             const data = await res.json();
-            resultDiv.innerHTML = `<p>Found: ${data.username} <button onclick="addFromSearch('${data.username}')">Add</button></p>`;
+            resultDiv.innerHTML = `<div class="item">${data.username} <button onclick="sendRequest('${data.username}')">Add Friend</button></div>`;
         } else {
             resultDiv.innerHTML = `<p>User not found</p>`;
         }
     }
 
-    async function loadFriends() {
-        const res = await fetch("/api/friends", { headers: { "Authorization": "Bearer " + token } });
-        const friends = await res.json();
-        const list = document.getElementById("friendsList");
-        list.innerHTML = friends.map(f => `<div>${f} <button onclick="removeFriend('${f}')">Remove</button></div>`).join('');
-    }
-
-    async function sendRequest() {
-        const username = document.getElementById("addFriendUsername").value;
-        await fetch("/api/friends", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-            body: JSON.stringify({ action: 'send-request', receiverUsername: username })
-        });
-        alert("Request sent");
+    async function sendRequest(username) {
+        await api('send-request', { receiverUsername: username });
+        alert("Request sent!");
     }
 
     async function removeFriend(username) {
-        await fetch("/api/friends", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-            body: JSON.stringify({ action: 'remove-friend', friendUsername: username })
-        });
+        await api('remove-friend', { friendUsername: username });
         loadFriends();
     }
 
+    async function loadRequests() {
+        const requests = await api('get-requests');
+        document.getElementById("friendRequestsList").innerHTML = requests.map(r => 
+            `<div class="item">${r.sender_username} <button onclick="acceptRequest('${r.id}')">Accept</button></div>`
+        ).join('');
+    }
+
     async function acceptRequest(id) {
-        await fetch("/api/friends", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-            body: JSON.stringify({ action: 'accept-request', requestId: id })
-        });
+        await api('accept-request', { requestId: id });
+        loadRequests();
         loadFriends();
     }
+
+    loadFriends();
+    loadRequests();
 </script>
 </body>
 </html>
