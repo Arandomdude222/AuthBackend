@@ -67,10 +67,10 @@
 
     async function searchPlayer() {
         const username = document.getElementById("searchUsername").value;
-        const res = await fetch("/api/search-players", {
+        const res = await fetch("/api/friends", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-            body: JSON.stringify({ username })
+            body: JSON.stringify({ action: 'search-players', username })
         });
         const resultDiv = document.getElementById("searchResults");
         if (res.ok) {
@@ -81,12 +81,8 @@
         }
     }
 
-    function addFromSearch(username) {
-        document.getElementById("addFriendUsername").value = username;
-    }
-
     async function loadFriends() {
-        const res = await fetch("/api/get-friends", { headers: { "Authorization": "Bearer " + token } });
+        const res = await fetch("/api/friends", { headers: { "Authorization": "Bearer " + token } });
         const friends = await res.json();
         const list = document.getElementById("friendsList");
         list.innerHTML = friends.map(f => `<div>${f} <button onclick="removeFriend('${f}')">Remove</button></div>`).join('');
@@ -94,44 +90,28 @@
 
     async function sendRequest() {
         const username = document.getElementById("addFriendUsername").value;
-        await fetch("/api/send-friend-request", {
+        await fetch("/api/friends", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-            body: JSON.stringify({ receiverUsername: username })
+            body: JSON.stringify({ action: 'send-request', receiverUsername: username })
         });
         alert("Request sent");
     }
 
     async function removeFriend(username) {
-        await fetch("/api/remove-friend", {
+        await fetch("/api/friends", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-            body: JSON.stringify({ friendUsername: username })
+            body: JSON.stringify({ action: 'remove-friend', friendUsername: username })
         });
         loadFriends();
     }
 
-    function setupRealtime() {
-        supabase.channel('friend-requests')
-            .on('postgres_changes', { 
-                event: 'INSERT', schema: 'public', table: 'friend_requests', 
-                filter: `receiver_username=eq.${currentUsername}` 
-            }, payload => renderFriendRequest(payload.new))
-            .subscribe();
-    }
-
-    function renderFriendRequest(req) {
-        const list = document.getElementById("friendRequestsList");
-        const div = document.createElement("div");
-        div.innerHTML = `<p>${req.sender_username} wants to be friends <button onclick="acceptRequest('${req.id}')">Accept</button></p>`;
-        list.appendChild(div);
-    }
-
     async function acceptRequest(id) {
-        await fetch("/api/accept-friend-request", {
+        await fetch("/api/friends", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-            body: JSON.stringify({ requestId: id })
+            body: JSON.stringify({ action: 'accept-request', requestId: id })
         });
         loadFriends();
     }
