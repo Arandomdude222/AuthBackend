@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Friends - DoxyClient</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; min-height: 100vh; background: radial-gradient(circle at 10% 20%, #0f325a 0%, #15203b 40%, #431f47 80%, #68263e 100%); background-attachment: fixed; color: #ffffff; }
+    main { max-width: 600px; margin: 0 auto; padding: 48px 24px 80px; }
+    .card { background-color: rgba(39, 42, 46, 0.65); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 26px 28px; margin-bottom: 24px; }
+    .card-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 4px; }
+    .card-desc { font-size: 0.85rem; color: #9ca3af; margin-bottom: 22px; }
+</style>
+</head>
+<body>
+<main>
+    <section class="card">
+        <div class="card-title">Friend Requests</div>
+        <p class="card-desc">Incoming requests will appear here.</p>
+        <div id="friendRequestsList"></div>
+    </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const token = localStorage.getItem("eaglercraft_token");
+    if (!token) location.href = "/login";
+    
+    // NOTE: Configure these
+    const SUPABASE_URL = ""; 
+    const SUPABASE_KEY = "";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let currentUsername = "";
+
+    async function init() {
+        try {
+            const res = await fetch("/api/me", { headers: { "Authorization": "Bearer " + token } });
+            const data = await res.json();
+            if (data.username) {
+                currentUsername = data.username;
+                setupRealtime();
+            }
+        } catch {}
+    }
+    init();
+
+    function setupRealtime() {
+        supabase.channel('friend-requests')
+            .on('postgres_changes', { 
+                event: 'INSERT', schema: 'public', table: 'friend_requests', 
+                filter: `receiver_username=eq.${currentUsername}` 
+            }, payload => renderFriendRequest(payload.new))
+            .subscribe();
+    }
+
+    function renderFriendRequest(req) {
+        const list = document.getElementById("friendRequestsList");
+        const div = document.createElement("div");
+        div.innerHTML = `<p>${req.sender_username} wants to be friends</p>`;
+        list.appendChild(div);
+    }
+</script>
+</body>
+</html>

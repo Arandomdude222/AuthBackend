@@ -222,30 +222,16 @@ footer.page-footer {
             </div>
         </form>
     </section>
-
-    <!-- FRIENDS CARD -->
-    <section class="card">
-        <div class="card-title">Friend Requests</div>
-        <p class="card-desc">Incoming requests will appear here.</p>
-        <div id="friendRequestsList"></div>
-    </section>
 </main>
 
 <footer class="page-footer">© 2026 DoxyClient</footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const token = localStorage.getItem("eaglercraft_token");
 
 if (!token) {
     location.href = "/login";
 }
-
-// NOTE: Ensure these are set in your environment
-const SUPABASE_URL = ""; 
-const SUPABASE_KEY = "";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let currentUsername = "";
 
 /* STATUS HELPER (per-card, UI only) */
 function showStatus(elId, kind, text) {
@@ -271,34 +257,11 @@ async function loadMe() {
         });
         const data = await res.json();
         if (data.username) {
-            currentUsername = data.username;
             document.getElementById("username").value = data.username;
-            setupRealtime();
         }
     } catch {}
 }
 loadMe();
-
-function setupRealtime() {
-    supabase
-        .channel('friend-requests')
-        .on('postgres_changes', { 
-            event: 'INSERT', 
-            schema: 'public', 
-            table: 'friend_requests', 
-            filter: `receiver_username=eq.${currentUsername}` 
-        }, payload => {
-            renderFriendRequest(payload.new);
-        })
-        .subscribe();
-}
-
-function renderFriendRequest(req) {
-    const list = document.getElementById("friendRequestsList");
-    const div = document.createElement("div");
-    div.innerHTML = `<p>${req.sender_username} wants to be friends</p>`;
-    list.appendChild(div);
-}
 
 /* SAVE USERNAME */
 document.getElementById("usernameForm").onsubmit = async (e) => {
