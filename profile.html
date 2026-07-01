@@ -2,24 +2,51 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Profile Settings - DoxyClient</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
+:root {
+    --bg-void: #14160f;
+    --panel-dark: #1c2016;
+    --panel-darker: #171a12;
+    --grass: #6a9438;
+    --grass-light: #8fbf52;
+    --grass-dark: #46601f;
+    --dirt: #6b4a2f;
+    --dirt-dark: #4a3220;
+    --stone: #6b6f63;
+    --ink-1: #000000;
+    --ink-2: rgba(0,0,0,0.45);
+    --shine: rgba(255,255,255,0.22);
+    --text-bright: #eef1e2;
+    --text-dim: #a7ae98;
+    --gold: #f4c04a;
+    --redstone: #d9553f;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
 
 body {
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
     display: flex;
-    background-color: #24272a;
-    color: #ffffff;
+    background-color: var(--bg-void);
+    color: var(--text-bright);
+    image-rendering: pixelated;
 }
 
-/* LEFT PANEL (unchanged) */
+/* ================= LEFT PANEL ================= */
 .left-panel {
     flex: 1;
+    position: relative;
+    overflow: hidden;
     background: radial-gradient(circle at 10% 20%, #0f325a 0%, #15203b 40%, #431f47 80%, #68263e 100%);
     display: flex;
     flex-direction: column;
@@ -27,34 +54,91 @@ body {
     padding: 10%;
 }
 
+/* floating ore blocks, ambient motion */
+.ore {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--ink-1);
+    box-shadow:
+        inset -3px -4px 0 0 var(--ink-2),
+        inset 3px 3px 0 0 var(--shine);
+    opacity: 0.55;
+    animation: drift 9s ease-in-out infinite;
+}
+.ore.gold { background: var(--gold); top: 18%; left: 72%; animation-delay: 0s; }
+.ore.green { background: var(--grass-light); top: 62%; left: 84%; width: 16px; height: 16px; animation-delay: 1.4s; }
+.ore.violet { background: #b98be0; top: 40%; left: 65%; width: 14px; height: 14px; animation-delay: 2.8s; }
+
+@keyframes drift {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-14px); }
+}
+
+/* terrain horizon strip */
+.terrain {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 46px;
+    display: flex;
+}
+.terrain .block {
+    flex: 1;
+    height: 100%;
+    background:
+        linear-gradient(var(--grass) 0 34%, var(--dirt) 34% 100%);
+    border-top: 2px solid var(--grass-light);
+    box-shadow: inset -2px 0 0 rgba(0,0,0,0.25);
+}
+.terrain .block:nth-child(odd) {
+    background:
+        linear-gradient(var(--grass-dark) 0 34%, var(--dirt-dark) 34% 100%);
+}
+
 .left-panel h1 {
-    font-size: 3rem;
+    position: relative;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1.9rem;
+    line-height: 1.5;
     font-weight: 400;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
+    text-shadow: 3px 3px 0 rgba(0,0,0,0.5);
+    letter-spacing: 1px;
 }
 
 .left-panel p {
-    font-size: 1.25rem;
-    color: rgba(255,255,255,0.9);
+    position: relative;
+    font-size: 1.05rem;
+    color: rgba(255,255,255,0.85);
+    max-width: 320px;
+    line-height: 1.5;
 }
 
-/* RIGHT PANEL (same style as login) */
+/* ================= RIGHT PANEL ================= */
 .right-panel {
-    width: 450px;
-    background-color: #272a2e;
+    width: 460px;
+    background-color: var(--panel-dark);
     display: flex;
     flex-direction: column;
     padding: 40px;
+    border-left: 3px solid var(--ink-1);
+    box-shadow: inset 4px 0 0 0 rgba(255,255,255,0.03);
 }
 
 .top-logo {
-    font-size: 1.1rem;
-    font-weight: 500;
+    font-size: 0.7rem;
+    font-family: 'Press Start 2P', monospace;
+    color: var(--grass-light);
     margin-bottom: 20px;
     display: flex;
     align-items: center;
     gap: 10px;
+    letter-spacing: 0.5px;
 }
+
+.top-logo svg { flex-shrink: 0; }
 
 .right-content {
     margin-top: auto;
@@ -62,15 +146,16 @@ body {
 }
 
 h2 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    margin-bottom: 12px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text-bright);
 }
 
 .subtitle {
-    font-size: 0.9rem;
-    color: #d1d5db;
-    margin-bottom: 25px;
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    margin-bottom: 26px;
 }
 
 .form-group {
@@ -79,60 +164,138 @@ h2 {
 
 label {
     display: block;
-    font-size: 0.85rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
     margin-bottom: 8px;
+    color: var(--text-dim);
 }
 
+/* Minecraft inventory-slot styled inputs */
 input {
     width: 100%;
-    padding: 12px;
-    border-radius: 4px;
-    border: 1px solid #4b5563;
-    background: transparent;
-    color: white;
+    padding: 12px 13px;
+    border-radius: 0;
+    border: 2px solid var(--ink-1);
+    background: var(--panel-darker);
+    color: var(--text-bright);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
     outline: none;
+    box-shadow:
+        inset 2px 2px 0 0 rgba(0,0,0,0.55),
+        inset -2px -2px 0 0 rgba(255,255,255,0.05);
+    transition: box-shadow 0.12s ease;
 }
 
 input:focus {
-    border-color: #60a5fa;
+    box-shadow:
+        inset 2px 2px 0 0 rgba(0,0,0,0.55),
+        inset -2px -2px 0 0 rgba(255,255,255,0.05),
+        0 0 0 2px var(--grass-light);
 }
 
+input::placeholder { color: #555c4b; }
+
+/* Minecraft button bevel */
 button {
     width: 100%;
-    background-color: #72a5f7;
-    color: #111827;
-    border: none;
+    background-color: var(--grass);
+    color: #10230a;
+    border: 2px solid var(--ink-1);
     padding: 13px;
-    border-radius: 4px;
-    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 0.92rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     cursor: pointer;
     margin-top: 10px;
+    box-shadow:
+        inset -3px -4px 0 0 rgba(0,0,0,0.35),
+        inset 3px 3px 0 0 rgba(255,255,255,0.28);
+    transition: transform 0.05s ease, filter 0.1s ease;
 }
 
 button:hover {
-    background-color: #93c5fd;
+    filter: brightness(1.08);
+}
+
+button:active {
+    transform: translateY(2px);
+    box-shadow:
+        inset 3px 4px 0 0 rgba(0,0,0,0.35),
+        inset -2px -2px 0 0 rgba(255,255,255,0.12);
 }
 
 .secondary {
-    background: #3a3f45;
-    color: white;
+    background: var(--stone);
+    color: var(--text-bright);
 }
 
-.secondary:hover {
-    background: #4a5158;
+.secondary:hover { filter: brightness(1.12); }
+
+#message { min-height: 0; }
+
+/* Achievement-style toast */
+.toast {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #1a1c14;
+    border: 2px solid var(--ink-1);
+    box-shadow:
+        inset 2px 2px 0 0 rgba(255,255,255,0.08),
+        inset -2px -2px 0 0 rgba(0,0,0,0.5),
+        0 6px 0 rgba(0,0,0,0.35);
+    padding: 12px 18px 12px 14px;
+    max-width: 300px;
+    transform: translateX(360px);
+    opacity: 0;
+    transition: transform 0.28s cubic-bezier(.2,.9,.3,1.2), opacity 0.2s ease;
+    z-index: 50;
 }
 
-#message {
-    margin-top: 15px;
-    text-align: center;
-    min-height: 20px;
+.toast.show { transform: translateX(0); opacity: 1; }
+
+.toast .icon {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    border: 2px solid var(--ink-1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 0.85rem;
+    font-family: 'Press Start 2P', monospace;
+}
+
+.toast.success .icon { background: var(--grass-light); color: #10230a; }
+.toast.error .icon { background: var(--redstone); color: #2a0805; }
+
+.toast .label {
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.toast .text {
+    font-size: 0.85rem;
+    color: var(--text-bright);
+    font-weight: 600;
 }
 
 .footer {
     margin-top: auto;
-    font-size: 0.8rem;
-    color: #9ca3af;
+    padding-top: 20px;
+    font-size: 0.75rem;
+    color: var(--text-dim);
     display: flex;
     gap: 15px;
 }
@@ -140,24 +303,42 @@ button:hover {
 .footer span {
     margin-left: auto;
 }
+
+@media (max-width: 760px) {
+    .left-panel { display: none; }
+    .right-panel { width: 100%; }
+}
 </style>
 </head>
 
 <body>
 
 <div class="left-panel">
+    <div class="ore gold"></div>
+    <div class="ore green"></div>
+    <div class="ore violet"></div>
+
     <h1>DoxyClient</h1>
     <p>Manage your Eaglercraft account settings</p>
+
+    <div class="terrain">
+        <div class="block"></div><div class="block"></div><div class="block"></div>
+        <div class="block"></div><div class="block"></div><div class="block"></div>
+        <div class="block"></div><div class="block"></div><div class="block"></div>
+        <div class="block"></div><div class="block"></div><div class="block"></div>
+        <div class="block"></div><div class="block"></div><div class="block"></div>
+        <div class="block"></div><div class="block"></div><div class="block"></div>
+    </div>
 </div>
 
 <div class="right-panel">
 
 <div class="top-logo">
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none"
 stroke="currentColor" stroke-width="2">
 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
 </svg>
-Profile
+PROFILE
 </div>
 
 <div class="right-content">
@@ -169,17 +350,17 @@ Profile
 
 <div class="form-group">
 <label>Username</label>
-<input id="username" type="text">
+<input id="username" type="text" placeholder="Steve">
 </div>
 
 <div class="form-group">
 <label>Current Password</label>
-<input id="currentPassword" type="password">
+<input id="currentPassword" type="password" placeholder="••••••••">
 </div>
 
 <div class="form-group">
 <label>New Password</label>
-<input id="newPassword" type="password">
+<input id="newPassword" type="password" placeholder="••••••••">
 </div>
 
 <button type="submit">Save Changes</button>
@@ -200,11 +381,46 @@ Log Out
 
 </div>
 
+<div class="toast" id="toast">
+    <div class="icon" id="toastIcon">✓</div>
+    <div>
+        <div class="label" id="toastLabel">Status</div>
+        <div class="text" id="toastText"></div>
+    </div>
+</div>
+
 <script>
 const token = localStorage.getItem("eaglercraft_token");
 
 if (!token) {
     location.href = "/login";
+}
+
+/* TOAST HELPER (UI only, no API involvement) */
+function showToast(kind, text) {
+    const toast = document.getElementById("toast");
+    const icon = document.getElementById("toastIcon");
+    const label = document.getElementById("toastLabel");
+    const body = document.getElementById("toastText");
+
+    toast.classList.remove("success", "error", "show");
+    void toast.offsetWidth; // restart animation
+
+    if (kind === "success") {
+        toast.classList.add("success");
+        icon.textContent = "✓";
+        label.textContent = "Success";
+    } else {
+        toast.classList.add("error");
+        icon.textContent = "!";
+        label.textContent = "Error";
+    }
+
+    body.textContent = text;
+    toast.classList.add("show");
+
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove("show"), 3500);
 }
 
 /* LOAD CURRENT USER */
@@ -269,12 +485,12 @@ document.getElementById("profileForm").onsubmit = async (e) => {
             if (!pRes.ok) throw new Error(pData.error || "Password failed");
         }
 
-        msg.style.color = "#4ade80";
-        msg.textContent = "Profile updated successfully";
+        msg.textContent = "";
+        showToast("success", "Profile updated successfully");
 
     } catch (err) {
-        msg.style.color = "#f87171";
-        msg.textContent = err.message;
+        msg.textContent = "";
+        showToast("error", err.message);
     }
 };
 
