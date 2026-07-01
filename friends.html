@@ -12,13 +12,25 @@
     .card { background-color: rgba(39, 42, 46, 0.65); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 26px 28px; margin-bottom: 24px; }
     .card-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 4px; }
     .card-desc { font-size: 0.85rem; color: #9ca3af; margin-bottom: 22px; }
+    input { width: 100%; padding: 12px; border-radius: 4px; border: 1px solid #4b5563; background: transparent; color: white; margin-bottom: 10px; }
+    button { padding: 10px 18px; border-radius: 4px; border: none; background: #72a5f7; cursor: pointer; }
 </style>
 </head>
 <body>
 <main>
     <section class="card">
+        <div class="card-title">Add Friend</div>
+        <input type="text" id="addFriendUsername" placeholder="Enter username">
+        <button onclick="sendRequest()">Send Request</button>
+    </section>
+
+    <section class="card">
+        <div class="card-title">My Friends</div>
+        <div id="friendsList"></div>
+    </section>
+
+    <section class="card">
         <div class="card-title">Friend Requests</div>
-        <p class="card-desc">Incoming requests will appear here.</p>
         <div id="friendRequestsList"></div>
     </section>
 </main>
@@ -39,11 +51,38 @@
             const data = await res.json();
             if (data.username) {
                 currentUsername = data.username;
+                loadFriends();
                 setupRealtime();
             }
         } catch {}
     }
     init();
+
+    async function loadFriends() {
+        const res = await fetch("/api/get-friends", { headers: { "Authorization": "Bearer " + token } });
+        const friends = await res.json();
+        const list = document.getElementById("friendsList");
+        list.innerHTML = friends.map(f => `<div>${f} <button onclick="removeFriend('${f}')">Remove</button></div>`).join('');
+    }
+
+    async function sendRequest() {
+        const username = document.getElementById("addFriendUsername").value;
+        await fetch("/api/send-friend-request", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+            body: JSON.stringify({ receiverUsername: username })
+        });
+        alert("Request sent");
+    }
+
+    async function removeFriend(username) {
+        await fetch("/api/remove-friend", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+            body: JSON.stringify({ friendUsername: username })
+        });
+        loadFriends();
+    }
 
     function setupRealtime() {
         supabase.channel('friend-requests')
@@ -57,8 +96,17 @@
     function renderFriendRequest(req) {
         const list = document.getElementById("friendRequestsList");
         const div = document.createElement("div");
-        div.innerHTML = `<p>${req.sender_username} wants to be friends</p>`;
+        div.innerHTML = `<p>${req.sender_username} wants to be friends <button onclick="acceptRequest('${req.id}')">Accept</button></p>`;
         list.appendChild(div);
+    }
+
+    async function acceptRequest(id) {
+        await fetch("/api/accept-friend-request", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+            body: JSON.stringify({ requestId: id })
+        });
+        loadFriends();
     }
 </script>
 </body>
