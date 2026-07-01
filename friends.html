@@ -41,15 +41,10 @@
         <div id="friendRequestsList"></div>
     </section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     const token = localStorage.getItem("eaglercraft_token");
     if (!token) location.href = "/login";
     
-    // NOTE: Configure these
-    const SUPABASE_URL = ""; 
-    const SUPABASE_KEY = "";
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     let currentUsername = "";
 
     async function init() {
@@ -60,7 +55,6 @@
                 currentUsername = data.username;
                 loadFriends();
                 loadRequests();
-                setupRealtime();
             }
         } catch {}
     }
@@ -75,22 +69,6 @@
         const requests = await res.json();
         const list = document.getElementById("friendRequestsList");
         list.innerHTML = requests.map(r => `<div>${r.sender_username} <button onclick="acceptRequest('${r.id}')">Accept</button></div>`).join('');
-    }
-
-    function setupRealtime() {
-        supabase.channel('friend-requests')
-            .on('postgres_changes', { 
-                event: 'INSERT', schema: 'public', table: 'friend_requests', 
-                filter: `receiver_username=eq.${currentUsername}` 
-            }, payload => renderFriendRequest(payload.new))
-            .subscribe();
-    }
-
-    function renderFriendRequest(req) {
-        const list = document.getElementById("friendRequestsList");
-        const div = document.createElement("div");
-        div.innerHTML = `<p>${req.sender_username} wants to be friends <button onclick="acceptRequest('${req.id}')">Accept</button></p>`;
-        list.appendChild(div);
     }
 
     async function searchPlayer() {
