@@ -5,389 +5,226 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Profile Settings - DoxyClient</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-:root {
-    --bg-void: #14160f;
-    --panel-dark: #1c2016;
-    --panel-darker: #171a12;
-    --grass: #6a9438;
-    --grass-light: #8fbf52;
-    --grass-dark: #46601f;
-    --dirt: #6b4a2f;
-    --dirt-dark: #4a3220;
-    --stone: #6b6f63;
-    --ink-1: #000000;
-    --ink-2: rgba(0,0,0,0.45);
-    --shine: rgba(255,255,255,0.22);
-    --text-bright: #eef1e2;
-    --text-dim: #a7ae98;
-    --gold: #f4c04a;
-    --redstone: #d9553f;
-}
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
-}
 
 body {
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
-    display: flex;
-    background-color: var(--bg-void);
-    color: var(--text-bright);
-    image-rendering: pixelated;
-}
-
-/* ================= LEFT PANEL ================= */
-.left-panel {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
     background: radial-gradient(circle at 10% 20%, #0f325a 0%, #15203b 40%, #431f47 80%, #68263e 100%);
+    background-attachment: fixed;
+    color: #ffffff;
+}
+
+/* ============ TOP BAR ============ */
+.topbar {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 10%;
+    align-items: center;
+    gap: 18px;
+    padding: 18px 32px;
+    background-color: rgba(39, 42, 46, 0.6);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
-/* floating ore blocks, ambient motion */
-.ore {
-    position: absolute;
-    width: 22px;
-    height: 22px;
-    border: 2px solid var(--ink-1);
-    box-shadow:
-        inset -3px -4px 0 0 var(--ink-2),
-        inset 3px 3px 0 0 var(--shine);
-    opacity: 0.55;
-    animation: drift 9s ease-in-out infinite;
-}
-.ore.gold { background: var(--gold); top: 18%; left: 72%; animation-delay: 0s; }
-.ore.green { background: var(--grass-light); top: 62%; left: 84%; width: 16px; height: 16px; animation-delay: 1.4s; }
-.ore.violet { background: #b98be0; top: 40%; left: 65%; width: 14px; height: 14px; animation-delay: 2.8s; }
-
-@keyframes drift {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-14px); }
-}
-
-/* terrain horizon strip */
-.terrain {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 46px;
-    display: flex;
-}
-.terrain .block {
-    flex: 1;
-    height: 100%;
-    background:
-        linear-gradient(var(--grass) 0 34%, var(--dirt) 34% 100%);
-    border-top: 2px solid var(--grass-light);
-    box-shadow: inset -2px 0 0 rgba(0,0,0,0.25);
-}
-.terrain .block:nth-child(odd) {
-    background:
-        linear-gradient(var(--grass-dark) 0 34%, var(--dirt-dark) 34% 100%);
-}
-
-.left-panel h1 {
-    position: relative;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 1.9rem;
-    line-height: 1.5;
-    font-weight: 400;
-    margin-bottom: 22px;
-    text-shadow: 3px 3px 0 rgba(0,0,0,0.5);
-    letter-spacing: 1px;
-}
-
-.left-panel p {
-    position: relative;
-    font-size: 1.05rem;
-    color: rgba(255,255,255,0.85);
-    max-width: 320px;
-    line-height: 1.5;
-}
-
-/* ================= RIGHT PANEL ================= */
-.right-panel {
-    width: 460px;
-    background-color: var(--panel-dark);
-    display: flex;
-    flex-direction: column;
-    padding: 40px;
-    border-left: 3px solid var(--ink-1);
-    box-shadow: inset 4px 0 0 0 rgba(255,255,255,0.03);
-}
-
-.top-logo {
-    font-size: 0.7rem;
-    font-family: 'Press Start 2P', monospace;
-    color: var(--grass-light);
-    margin-bottom: 20px;
+.brand {
     display: flex;
     align-items: center;
     gap: 10px;
-    letter-spacing: 0.5px;
+    font-size: 1.1rem;
+    font-weight: 500;
 }
 
-.top-logo svg { flex-shrink: 0; }
+.back-link {
+    margin-left: auto;
+    font-size: 0.9rem;
+    color: #9ca3af;
+    text-decoration: none;
+}
+.back-link:hover { color: #ffffff; }
 
-.right-content {
-    margin-top: auto;
-    margin-bottom: auto;
+button {
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
 }
 
-h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-    color: var(--text-bright);
+.btn-primary {
+    background-color: #72a5f7;
+    color: #111827;
+}
+.btn-primary:hover { background-color: #93c5fd; }
+.btn-primary:disabled { background-color: #4b5f80; color: #9ca3af; cursor: not-allowed; }
+
+.btn-quiet {
+    background: #3a3f45;
+    color: white;
+}
+.btn-quiet:hover { background: #4a5158; }
+
+/* ============ MAIN ============ */
+main {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
 }
 
-.subtitle {
-    font-size: 0.88rem;
-    color: var(--text-dim);
-    margin-bottom: 26px;
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 8px;
 }
 
-.form-group {
-    margin-bottom: 18px;
+.page-subtitle {
+    font-size: 0.9rem;
+    color: #d1d5db;
+    margin-bottom: 32px;
+}
+
+.card {
+    background-color: rgba(39, 42, 46, 0.65);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 26px 28px;
+    margin-bottom: 24px;
+}
+
+.card-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.card-desc {
+    font-size: 0.85rem;
+    color: #9ca3af;
+    margin-bottom: 22px;
+}
+
+.form-row {
+    margin-bottom: 16px;
+}
+
+.form-row.split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
 }
 
 label {
     display: block;
-    font-size: 0.78rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
+    font-size: 0.85rem;
     margin-bottom: 8px;
-    color: var(--text-dim);
+    color: #d1d5db;
 }
 
-/* Minecraft inventory-slot styled inputs */
 input {
     width: 100%;
-    padding: 12px 13px;
-    border-radius: 0;
-    border: 2px solid var(--ink-1);
-    background: var(--panel-darker);
-    color: var(--text-bright);
+    padding: 12px;
+    border-radius: 4px;
+    border: 1px solid #4b5563;
+    background: transparent;
+    color: white;
+    outline: none;
     font-family: 'Inter', sans-serif;
     font-size: 0.95rem;
-    outline: none;
-    box-shadow:
-        inset 2px 2px 0 0 rgba(0,0,0,0.55),
-        inset -2px -2px 0 0 rgba(255,255,255,0.05);
-    transition: box-shadow 0.12s ease;
 }
+input:focus { border-color: #60a5fa; }
+input::placeholder { color: #6b7280; }
 
-input:focus {
-    box-shadow:
-        inset 2px 2px 0 0 rgba(0,0,0,0.55),
-        inset -2px -2px 0 0 rgba(255,255,255,0.05),
-        0 0 0 2px var(--grass-light);
-}
-
-input::placeholder { color: #555c4b; }
-
-/* Minecraft button bevel */
-button {
-    width: 100%;
-    background-color: var(--grass);
-    color: #10230a;
-    border: 2px solid var(--ink-1);
-    padding: 13px;
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
-    font-size: 0.92rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    margin-top: 10px;
-    box-shadow:
-        inset -3px -4px 0 0 rgba(0,0,0,0.35),
-        inset 3px 3px 0 0 rgba(255,255,255,0.28);
-    transition: transform 0.05s ease, filter 0.1s ease;
-}
-
-button:hover {
-    filter: brightness(1.08);
-}
-
-button:active {
-    transform: translateY(2px);
-    box-shadow:
-        inset 3px 4px 0 0 rgba(0,0,0,0.35),
-        inset -2px -2px 0 0 rgba(255,255,255,0.12);
-}
-
-.secondary {
-    background: var(--stone);
-    color: var(--text-bright);
-}
-
-.secondary:hover { filter: brightness(1.12); }
-
-#message { min-height: 0; }
-
-/* Achievement-style toast */
-.toast {
-    position: fixed;
-    top: 24px;
-    right: 24px;
+.card-footer {
     display: flex;
     align-items: center;
-    gap: 12px;
-    background: #1a1c14;
-    border: 2px solid var(--ink-1);
-    box-shadow:
-        inset 2px 2px 0 0 rgba(255,255,255,0.08),
-        inset -2px -2px 0 0 rgba(0,0,0,0.5),
-        0 6px 0 rgba(0,0,0,0.35);
-    padding: 12px 18px 12px 14px;
-    max-width: 300px;
-    transform: translateX(360px);
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 16px;
+}
+
+.status {
+    font-size: 0.85rem;
+    min-height: 18px;
     opacity: 0;
-    transition: transform 0.28s cubic-bezier(.2,.9,.3,1.2), opacity 0.2s ease;
-    z-index: 50;
+    transition: opacity 0.15s ease;
 }
+.status.show { opacity: 1; }
+.status.success { color: #4ade80; }
+.status.error { color: #f87171; }
 
-.toast.show { transform: translateX(0); opacity: 1; }
-
-.toast .icon {
-    width: 26px;
-    height: 26px;
-    flex-shrink: 0;
-    border: 2px solid var(--ink-1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    font-family: 'Press Start 2P', monospace;
-}
-
-.toast.success .icon { background: var(--grass-light); color: #10230a; }
-.toast.error .icon { background: var(--redstone); color: #2a0805; }
-
-.toast .label {
-    font-size: 0.68rem;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 2px;
-}
-
-.toast .text {
-    font-size: 0.85rem;
-    color: var(--text-bright);
-    font-weight: 600;
-}
-
-.footer {
-    margin-top: auto;
-    padding-top: 20px;
-    font-size: 0.75rem;
-    color: var(--text-dim);
-    display: flex;
-    gap: 15px;
-}
-
-.footer span {
-    margin-left: auto;
-}
-
-@media (max-width: 760px) {
-    .left-panel { display: none; }
-    .right-panel { width: 100%; }
+footer.page-footer {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #9ca3af;
+    padding: 20px 0 40px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="left-panel">
-    <div class="ore gold"></div>
-    <div class="ore green"></div>
-    <div class="ore violet"></div>
-
-    <h1>DoxyClient</h1>
-    <p>Manage your Eaglercraft account settings</p>
-
-    <div class="terrain">
-        <div class="block"></div><div class="block"></div><div class="block"></div>
-        <div class="block"></div><div class="block"></div><div class="block"></div>
-        <div class="block"></div><div class="block"></div><div class="block"></div>
-        <div class="block"></div><div class="block"></div><div class="block"></div>
-        <div class="block"></div><div class="block"></div><div class="block"></div>
-        <div class="block"></div><div class="block"></div><div class="block"></div>
+<div class="topbar">
+    <div class="brand">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+        DoxyClient
     </div>
+    <a class="back-link" href="/">&larr; Back to game</a>
+    <button class="btn-quiet" id="logoutBtn" type="button">Log Out</button>
 </div>
 
-<div class="right-panel">
+<main>
+    <h1 class="page-title">Account Settings</h1>
+    <p class="page-subtitle">Manage the username and password on your Eaglercraft account.</p>
 
-<div class="top-logo">
-<svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-stroke="currentColor" stroke-width="2">
-<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-</svg>
-PROFILE
-</div>
+    <!-- USERNAME CARD -->
+    <section class="card">
+        <div class="card-title">Username</div>
+        <p class="card-desc">This is the name other players see on your friends list and in-game.</p>
 
-<div class="right-content">
+        <form id="usernameForm">
+            <div class="form-row">
+                <label for="username">Username</label>
+                <input id="username" type="text" placeholder="Steve" autocomplete="username">
+            </div>
+            <div class="card-footer">
+                <div class="status" id="usernameStatus"></div>
+                <button class="btn-primary" type="submit">Save Username</button>
+            </div>
+        </form>
+    </section>
 
-<h2>Account Settings</h2>
-<div class="subtitle">Update your username and password</div>
+    <!-- PASSWORD CARD -->
+    <section class="card">
+        <div class="card-title">Password</div>
+        <p class="card-desc">Choose a new password. You'll need your current one to confirm.</p>
 
-<form id="profileForm">
+        <form id="passwordForm">
+            <div class="form-row split">
+                <div>
+                    <label for="currentPassword">Current Password</label>
+                    <input id="currentPassword" type="password" placeholder="••••••••" autocomplete="current-password">
+                </div>
+                <div>
+                    <label for="newPassword">New Password</label>
+                    <input id="newPassword" type="password" placeholder="••••••••" autocomplete="new-password">
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="status" id="passwordStatus"></div>
+                <button class="btn-primary" type="submit">Save Password</button>
+            </div>
+        </form>
+    </section>
+</main>
 
-<div class="form-group">
-<label>Username</label>
-<input id="username" type="text" placeholder="Steve">
-</div>
-
-<div class="form-group">
-<label>Current Password</label>
-<input id="currentPassword" type="password" placeholder="••••••••">
-</div>
-
-<div class="form-group">
-<label>New Password</label>
-<input id="newPassword" type="password" placeholder="••••••••">
-</div>
-
-<button type="submit">Save Changes</button>
-
-<button type="button" class="secondary" id="logoutBtn">
-Log Out
-</button>
-
-<p id="message"></p>
-
-</form>
-
-</div>
-
-<div class="footer">
-<span>© 2026 DoxyClient</span>
-</div>
-
-</div>
-
-<div class="toast" id="toast">
-    <div class="icon" id="toastIcon">✓</div>
-    <div>
-        <div class="label" id="toastLabel">Status</div>
-        <div class="text" id="toastText"></div>
-    </div>
-</div>
+<footer class="page-footer">© 2026 DoxyClient</footer>
 
 <script>
 const token = localStorage.getItem("eaglercraft_token");
@@ -396,63 +233,45 @@ if (!token) {
     location.href = "/login";
 }
 
-/* TOAST HELPER (UI only, no API involvement) */
-function showToast(kind, text) {
-    const toast = document.getElementById("toast");
-    const icon = document.getElementById("toastIcon");
-    const label = document.getElementById("toastLabel");
-    const body = document.getElementById("toastText");
+/* STATUS HELPER (per-card, UI only) */
+function showStatus(elId, kind, text) {
+    const el = document.getElementById(elId);
+    el.classList.remove("success", "error", "show");
+    el.textContent = text;
+    void el.offsetWidth;
+    el.classList.add(kind, "show");
+}
 
-    toast.classList.remove("success", "error", "show");
-    void toast.offsetWidth; // restart animation
-
-    if (kind === "success") {
-        toast.classList.add("success");
-        icon.textContent = "✓";
-        label.textContent = "Success";
-    } else {
-        toast.classList.add("error");
-        icon.textContent = "!";
-        label.textContent = "Error";
-    }
-
-    body.textContent = text;
-    toast.classList.add("show");
-
-    clearTimeout(showToast._t);
-    showToast._t = setTimeout(() => toast.classList.remove("show"), 3500);
+function setLoading(form, loading) {
+    const btn = form.querySelector("button[type=submit]");
+    btn.disabled = loading;
+    btn.dataset.label = btn.dataset.label || btn.textContent;
+    btn.textContent = loading ? "Saving..." : btn.dataset.label;
 }
 
 /* LOAD CURRENT USER */
 async function loadMe() {
     try {
         const res = await fetch("/api/me", {
-            headers: {
-                "Authorization": "Bearer " + token
-            }
+            headers: { "Authorization": "Bearer " + token }
         });
-
         const data = await res.json();
         if (data.username) {
             document.getElementById("username").value = data.username;
         }
     } catch {}
 }
-
 loadMe();
 
-/* SAVE CHANGES */
-document.getElementById("profileForm").onsubmit = async (e) => {
+/* SAVE USERNAME */
+document.getElementById("usernameForm").onsubmit = async (e) => {
     e.preventDefault();
-
-    const msg = document.getElementById("message");
+    const form = e.target;
+    setLoading(form, true);
 
     try {
         const newUsername = document.getElementById("username").value;
-        const currentPassword = document.getElementById("currentPassword").value;
-        const newPassword = document.getElementById("newPassword").value;
 
-        /* 1. CHANGE USERNAME */
         const uRes = await fetch("/api/change-username", {
             method: "POST",
             headers: {
@@ -463,34 +282,55 @@ document.getElementById("profileForm").onsubmit = async (e) => {
         });
 
         const uData = await uRes.json();
+        if (!uRes.ok) throw new Error(uData.error || "Could not update username");
+
         if (uData.session?.access_token) {
             localStorage.setItem("eaglercraft_token", uData.session.access_token);
         }
 
-        /* 2. CHANGE PASSWORD (only if filled) */
-        if (newPassword && currentPassword) {
-            const pRes = await fetch("/api/change-password", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + token
-                },
-                body: JSON.stringify({
-                    currentPassword,
-                    newPassword
-                })
-            });
-
-            const pData = await pRes.json();
-            if (!pRes.ok) throw new Error(pData.error || "Password failed");
-        }
-
-        msg.textContent = "";
-        showToast("success", "Profile updated successfully");
-
+        showStatus("usernameStatus", "success", "Username updated");
     } catch (err) {
-        msg.textContent = "";
-        showToast("error", err.message);
+        showStatus("usernameStatus", "error", err.message);
+    } finally {
+        setLoading(form, false);
+    }
+};
+
+/* SAVE PASSWORD */
+document.getElementById("passwordForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+
+    const currentPassword = document.getElementById("currentPassword").value;
+    const newPassword = document.getElementById("newPassword").value;
+
+    if (!currentPassword || !newPassword) {
+        showStatus("passwordStatus", "error", "Fill in both password fields");
+        return;
+    }
+
+    setLoading(form, true);
+
+    try {
+        const pRes = await fetch("/api/change-password", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({ currentPassword, newPassword })
+        });
+
+        const pData = await pRes.json();
+        if (!pRes.ok) throw new Error(pData.error || "Password failed");
+
+        document.getElementById("currentPassword").value = "";
+        document.getElementById("newPassword").value = "";
+        showStatus("passwordStatus", "success", "Password updated");
+    } catch (err) {
+        showStatus("passwordStatus", "error", err.message);
+    } finally {
+        setLoading(form, false);
     }
 };
 
