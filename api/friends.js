@@ -50,9 +50,14 @@ module.exports = async (req, res) => {
       }
       case 'search-players': {
         const { username } = req.body;
-        const { data, error } = await supabase.from('users').select('username').eq('username', username).single();
-        if (error || !data) return res.status(404).json({ error: 'User not found' });
-        return res.status(200).json({ username: data.username });
+        if (!username || username.length < 2) return res.status(200).json([]);
+        const { data, error } = await supabase
+          .from('users')
+          .select('username')
+          .ilike('username', `%${username}%`)
+          .limit(10);
+        if (error) return res.status(400).json({ error: error.message });
+        return res.status(200).json(data);
       }
       default:
         return res.status(400).json({ error: 'Invalid action' });

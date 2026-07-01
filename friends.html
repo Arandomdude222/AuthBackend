@@ -71,7 +71,7 @@
 
     async function searchPlayer() {
         const username = document.getElementById("searchUsername").value;
-        if (!username) return;
+        if (!username) { document.getElementById("searchResults").innerHTML = ''; return; }
         const res = await fetch("/api/friends", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
@@ -79,10 +79,12 @@
         });
         const resultDiv = document.getElementById("searchResults");
         if (res.ok) {
-            const data = await res.json();
-            resultDiv.innerHTML = `<div class="item">${data.username} <button onclick="sendRequest('${data.username}')">Add Friend</button></div>`;
+            const users = await res.json();
+            resultDiv.innerHTML = users.map(u => 
+                `<div class="item">${u.username} <button onclick="sendRequest('${u.username}')">Add Friend</button></div>`
+            ).join('');
         } else {
-            resultDiv.innerHTML = `<p>User not found</p>`;
+            resultDiv.innerHTML = `<p>No users found</p>`;
         }
     }
 
